@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Global Misalignment Index: compare AMR research funding with the deaths each pathogen causes, and test reallocations. Team 13282, 2026 Vivli AMR Data Challenge.">
+<meta name="description" content="Global Misalignment Index for any AMR funder: compare funding with burden for any pathogens, see WHO priority tiers, and test reallocations. Team 13282, 2026 Vivli AMR Data Challenge.">
 <meta property="og:title" content="Follow the Deaths">
 <meta property="og:description" content="Is AMR research money going where the deaths are? An interactive Global Misalignment Index.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23111'/%3E%3Crect x='7' y='17' width='5' height='8' fill='%232F6DB5'/%3E%3Crect x='14' y='8' width='5' height='17' fill='%23D2691E'/%3E%3Crect x='21' y='13' width='5' height='12' fill='%23fff'/%3E%3C/svg%3E">
@@ -95,7 +95,7 @@ main{max-width:1280px; margin:0 auto; padding:24px 24px 56px; display:flex; flex
 .panel-h h2{margin:0; font-size:16px; font-weight:700}
 .legend{display:flex; gap:16px; font-size:12px; color:var(--ink-2); flex-wrap:wrap}
 .legend i{display:inline-block; width:14px; height:8px; border-radius:2px; margin-right:6px; vertical-align:middle}
-.grid{display:grid; grid-template-columns:170px minmax(0,1fr) 100px 70px; column-gap:16px; align-items:center}
+.grid{display:grid; grid-template-columns:190px minmax(0,1fr) 92px 104px 64px; column-gap:16px; align-items:center}
 .axis{padding-bottom:6px; border-bottom:1px solid var(--ink)}
 .axis .ax{position:relative; height:16px}
 .axis .ax span{position:absolute; transform:translateX(-50%); font:11px var(--mono); color:var(--muted)}
@@ -211,6 +211,34 @@ footer a{color:var(--fund)}
 .tip b{font-style:italic; font-size:14px} .tip .k{color:#BDBDBD}
 .toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:#fff; font-size:13px; padding:8px 14px; border-radius:8px; opacity:0; transition:opacity .2s; pointer-events:none}
 @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+/* ---------- v2 additions ---------- */
+.ds{display:flex; align-items:center; gap:8px}
+.ds select{font:500 13px var(--sans); color:#fff; background:#222; border:1px solid #444; border-radius:7px; padding:6px 28px 6px 10px; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:linear-gradient(45deg,transparent 50%,#BDBDBD 50%),linear-gradient(135deg,#BDBDBD 50%,transparent 50%); background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%; background-size:5px 5px; background-repeat:no-repeat}
+.ds select:focus-visible{outline:2px solid #8DB0DA; outline-offset:2px}
+.banner{display:flex; align-items:center; justify-content:space-between; gap:12px 20px; flex-wrap:wrap; background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--fund); border-radius:10px; padding:12px 16px; font-size:14px; color:var(--ink-2)}
+.banner b{color:var(--ink)}
+.banner .acts{display:flex; gap:8px; flex-wrap:wrap}
+.who .tags{display:flex; gap:6px; flex-wrap:wrap}
+.pill.who-c{color:#fff; background:#111; border-color:#111}
+.pill.who-h{color:#111; border-color:#111}
+.pill.who-m{color:var(--muted)}
+.sortbar{display:flex; gap:8px; align-items:center; font-size:12px; color:var(--muted)}
+.meta-grid{display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px}
+@media (max-width:760px){ .meta-grid{grid-template-columns:1fr} }
+.field{display:flex; flex-direction:column; gap:4px}
+.field label{font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.field input{font:500 14px var(--sans); color:var(--ink); border:1px solid var(--line-2); border-radius:8px; padding:8px 10px; background:#fff}
+.field input:focus{border-color:var(--ink); outline:none}
+td .tier{font:600 11px var(--sans); letter-spacing:.04em; text-transform:uppercase; color:var(--muted); white-space:nowrap}
+.file{font:600 13px var(--sans); border:1px solid var(--line-2); border-radius:8px; padding:8px 14px; background:#fff; cursor:pointer}
+.file input{display:none}
+.who .gnote{font-size:11px; color:var(--muted); font-style:normal; font-weight:500}
+.res{font:600 14px/1.2 var(--mono); display:flex; flex-direction:column}
+.res small{font:500 11px var(--sans); color:var(--muted)}
+.res .up{color:var(--under)} .res .flat{color:var(--muted)}
+.kpi .rng{font:500 12px var(--mono); color:#BDBDBD}
+.scope{font-size:12px; color:var(--muted); margin:0}
+.empty-state{padding:28px 0; text-align:center; color:var(--muted); font-size:14px}
 </style>
 </head>
 <body>
@@ -224,7 +252,12 @@ footer a{color:var(--fund)}
       <button role="tab" id="tab-method" aria-selected="false" aria-controls="view-method" data-view="method">Method</button>
     </nav>
     <div class="bar-right">
-      <span class="dataset" id="dataset"><span class="dot"></span><span id="dataset-t">Vivli 2026 study · 6 pathogens</span></span>
+      <div class="ds"><label for="ds-select" style="font-size:12px; color:#BDBDBD">Dataset</label>
+        <select id="ds-select">
+          <option value="vivli">6 leading pathogens · Hub × GRAM 2019</option>
+          <option value="blank">New portfolio</option>
+          <option value="custom" disabled>Custom portfolio</option>
+        </select></div>
       <button class="btn-light" id="copy">Copy summary</button>
     </div>
   </div>
@@ -234,7 +267,7 @@ footer a{color:var(--fund)}
   <!-- OVERVIEW -->
   <section class="view" id="view-overview" role="tabpanel" aria-labelledby="tab-overview">
     <div class="page-h">
-      <div><h1>Funding vs burden</h1><p id="sub">Global AMR R&amp;D Hub funding against GRAM 2019 attributable deaths</p></div>
+      <div><h1 id="ds-name">6 leading pathogens</h1><p id="sub"></p></div>
       <div class="filters" id="filters">
         <div class="filter"><span>Burden</span>
           <div class="seg" id="seg-burden">
@@ -254,59 +287,68 @@ footer a{color:var(--fund)}
     <div class="kpis">
       <div class="panel kpi main">
         <span class="eyebrow">Misalignment index</span>
-        <div class="row1"><span class="v" id="k-gmi" aria-live="polite">25.3<small>%</small></span><span class="delta" id="k-delta">current</span></div>
+        <div class="row1"><span class="v" id="k-gmi" aria-live="polite">–</span><span class="delta" id="k-delta">current</span></div>
         <div class="meter" aria-hidden="true"><div class="fill" id="k-meter"></div><div class="mk" id="k-mark"></div></div>
         <span class="s" id="k-cap">of funding would have to move to match burden</span>
+        <span class="rng" id="k-rng"></span>
       </div>
-      <div class="panel kpi"><span class="eyebrow">Funding analysed</span><span class="v" id="k-total">$4.17B</span><span class="s" id="k-total-s">across 6 pathogens</span></div>
-      <div class="panel kpi"><span class="eyebrow">Most under-funded</span><span class="v" id="k-worst">−12.4 pp</span><span class="s" id="k-worst-s"><i>K. pneumoniae</i></span></div>
-      <div class="panel kpi"><span class="eyebrow">To align everything</span><span class="v" id="k-full">$1.05B</span><span class="s">moved between pathogens, no new money</span></div>
+      <div class="panel kpi"><span class="eyebrow">Funding analysed</span><span class="v" id="k-total">–</span><span class="s" id="k-total-s"></span></div>
+      <div class="panel kpi"><span class="eyebrow">Most under-funded</span><span class="v" id="k-worst">–</span><span class="s" id="k-worst-s"></span></div>
+      <div class="panel kpi"><span class="eyebrow">To align everything</span><span class="v" id="k-full">–</span><span class="s">to match burden exactly. An audit, not a funding formula.</span></div>
     </div>
 
     <div class="bench">
       <div class="panel chart" aria-label="Funding share against burden share">
         <div class="panel-h">
           <h2>Share of funding vs share of burden</h2>
-          <div class="legend"><span><i style="background:var(--fund)"></i>Funding</span><span><i style="background:var(--death)"></i><span id="leg-b">Deaths</span></span></div>
+          <div class="sortbar"><span>Sort</span>
+            <div class="seg" id="seg-sort">
+              <button data-k="gap" aria-pressed="true">Gap</button>
+              <button data-k="burden" aria-pressed="false">Burden</button>
+              <button data-k="name" aria-pressed="false">Name</button>
+            </div></div>
         </div>
-        <div class="grid axis" aria-hidden="true"><span class="h">Pathogen</span><div class="ax" id="axis"></div><span class="h">Gap</span><span class="h">Late-stage</span></div>
+        <div class="legend" style="margin-bottom:10px"><span><i style="background:var(--fund)"></i>Funding</span><span><i style="background:var(--death)"></i><span id="leg-b">Burden</span></span></div>
+        <div class="grid axis" aria-hidden="true"><span class="h">Pathogen</span><div class="ax" id="axis"></div><span class="h">Gap</span><span class="h">Resistance</span><span class="h">Late-stage</span></div>
         <div id="rows"></div>
-        <p class="note">Gap = funding share minus burden share (percentage points). Late-stage = therapeutic projects in development or approval. Hover a row for detail.</p>
+        <p class="note">Gap = funding share minus burden share (percentage points). Resistance = share of isolates resistant to nearly all drugs, 2024, Vivli AMR Register, with 2019–24 direction. Late-stage = therapeutic projects in development or approval. WHO = Bacterial Priority Pathogens List 2024, for the resistance type shown. The index compares only the pathogens listed; adding or removing one changes it.</p>
       </div>
 
       <aside class="panel side" aria-label="Rebalance">
         <span class="eyebrow">Rebalance</span>
-        <h2>Move money to the pathogens you choose</h2>
+        <h2>Test a reallocation</h2>
         <div class="amount"><output id="amt-out" for="amt">$0M</output><span class="of" id="amt-of"></span></div>
         <div class="slider">
-          <div class="band" id="ask-band"></div>
-          <div class="band-label" id="ask-label">our ask: $400–600M</div>
-          <input type="range" id="amt" min="0" max="1200" step="10" value="0" aria-label="Money moved, in millions of US dollars">
+          <input type="range" id="amt" min="0" max="1200" step="10" value="0" aria-label="Money moved">
           <div class="scale" id="scale"></div>
         </div>
         <div class="chips" role="group" aria-label="Scenarios" id="presets"></div>
         <span class="lbl">Receives the money</span>
+        <div class="seg" id="seg-mode" style="align-self:flex-start">
+          <button data-k="auto" aria-pressed="true">All under-funded</button>
+          <button data-k="pick" aria-pressed="false">Choose</button>
+        </div>
         <div class="chips" role="group" aria-label="Pathogens that receive money" id="recv"></div>
-        <p class="how">Taken from over-funded pathogens in proportion to their surplus; given to the chosen ones in proportion to their gap. Total funding stays the same.</p>
+        <p class="how">Taken from over-funded pathogens in proportion to their surplus; given to the receivers in proportion to their gap. Total funding stays the same.</p>
         <div class="result">
-          <div><b id="r-gmi">25.3%</b><span>index after the move</span></div>
-          <div><b id="r-closed">0%</b><span id="r-closed-l">of the chosen gaps closed</span></div>
+          <div><b id="r-gmi">–</b><span>index after the move</span></div>
+          <div><b id="r-closed">0%</b><span id="r-closed-l">of the gaps closed</span></div>
         </div>
       </aside>
     </div>
 
     <div class="panel why" aria-label="Why this score">
       <div class="why-h">
-        <h2 id="why-title">Why 25.3%?</h2>
+        <h2 id="why-title">Why this score?</h2>
         <p>Every point of funding share one pathogen has above its burden is a point missing from another. The two bars always balance. Their length is the index.</p>
       </div>
       <div class="bal">
         <div class="side-l">Above their share<small>over-funded</small></div>
         <div class="track" id="over-track"></div>
-        <div class="tot" id="over-tot">+25.3</div>
+        <div class="tot" id="over-tot"></div>
         <div class="side-l">Below their share<small>under-funded</small></div>
         <div class="track" id="under-track"></div>
-        <div class="tot" id="under-tot">−25.3</div>
+        <div class="tot" id="under-tot"></div>
       </div>
       <div class="keylist" id="keylist"></div>
     </div>
@@ -314,25 +356,31 @@ footer a{color:var(--fund)}
 
   <!-- DATA -->
   <section class="view" id="view-data" role="tabpanel" aria-labelledby="tab-data" hidden>
-    <div class="page-h"><div><h1>Portfolio data</h1><p>Edit any cell and the Overview updates. Units don't matter, only proportions.</p></div></div>
+    <div class="page-h"><div><h1>Your portfolio</h1><p>Any pathogens, any funder, any region. Units don't matter, only proportions.</p></div></div>
     <div class="panel editor">
+      <div class="meta-grid">
+        <div class="field"><label for="f-name">Portfolio name</label><input id="f-name" placeholder="e.g. National AMR fund 2025"></div>
+        <div class="field"><label for="f-burden">Burden measure</label><input id="f-burden" placeholder="e.g. Deaths, DALYs, cases"></div>
+        <div class="field"><label for="f-cur">Currency / unit</label><input id="f-cur" placeholder="e.g. $, €, £"></div>
+      </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th style="width:34%">Pathogen</th><th style="width:20%; text-align:right">Funding (USD M)</th><th style="width:22%; text-align:right" id="th-burden">Burden (deaths)</th><th style="width:16%; text-align:right">Late-stage projects</th><th style="width:8%"></th></tr></thead>
+          <thead><tr><th style="width:28%">Pathogen</th><th style="width:16%">WHO priority</th><th style="width:14%; text-align:right" id="th-fund">Funding (M)</th><th style="width:14%; text-align:right" id="th-burden">Burden</th><th style="width:10%; text-align:right">Resistant %</th><th style="width:10%; text-align:right">Late-stage</th><th style="width:8%"></th></tr></thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
+      <datalist id="pathogens"></datalist>
       <div class="actions">
         <button class="btn" id="add-row">Add pathogen</button>
-        <button class="btn ghost" id="reset">Reset to Vivli study</button>
+        <button class="btn ghost" id="clear">Clear all</button>
         <span class="msg" id="data-msg"></span>
       </div>
     </div>
     <div class="panel editor">
-      <h2 style="margin:0; font-size:16px">Import a portfolio</h2>
-      <p class="how">Paste one pathogen per line: <span class="num">name, funding, burden, late-stage projects</span> (last column optional). This replaces the table.</p>
-      <textarea id="csv" aria-label="Portfolio CSV" placeholder="Klebsiella pneumoniae, 349, 193000, 9&#10;Enterococcus faecium, 120, 50000, 3"></textarea>
-      <div class="actions"><button class="btn" id="load-csv">Import</button><span class="msg" id="csv-msg"></span></div>
+      <h2 style="margin:0; font-size:16px">Import</h2>
+      <p class="how">One pathogen per line: <span class="num">name, funding, burden, late-stage projects, resistant %</span> (last two optional; a header row is fine). Paste below or upload a .csv file. This replaces the table.</p>
+      <textarea id="csv" aria-label="Portfolio CSV" placeholder="pathogen, funding, burden, late_stage&#10;Enterococcus faecium, 120, 50000, 3&#10;Mycobacterium tuberculosis, 900, 450000, 12"></textarea>
+      <div class="actions"><button class="btn" id="load-csv">Import pasted data</button><label class="file" for="file">Upload .csv<input type="file" id="file" accept=".csv,.tsv,.txt,text/csv"></label><span class="msg" id="csv-msg"></span></div>
     </div>
   </section>
 
@@ -342,7 +390,7 @@ footer a{color:var(--fund)}
     <div class="method">
       <article class="panel">
         <h3>The index in one sentence</h3>
-        <p>The share of total funding that would have to move between pathogens for each one's funding share to equal its share of the burden. 0% is perfect alignment.</p>
+        <p>The share of total funding that would have to move between pathogens for each one's funding share to equal its share of the burden. 0% is perfect alignment; it works for any list of pathogens and any burden measure.</p>
         <p class="fine">GMI = ½ Σ |funding share − burden share| (total-variation distance)</p>
       </article>
       <article class="panel">
@@ -352,15 +400,18 @@ footer a{color:var(--fund)}
           <li><b>Pipeline OK</b>: under-funded, but well stocked with late-stage drugs.</li>
           <li><b>Well-resourced</b>: over-funded, with a strong pipeline.</li>
           <li><b>Low translation</b>: over-funded, but few late-stage drugs.</li>
+          <li><b>WHO priority</b>: tier on the WHO Bacterial Priority Pathogens List 2024, shown with the resistance type it applies to (e.g. carbapenem-resistant). Matched from the name.</li>
+          <li><b>Resistance</b>: share of isolates in the extensively drug-resistant group (latent class analysis), Vivli AMR Register. ↑ rising, → flat, 2019–2024.</li>
+          <li><b>Genus artefact</b>: funding recorded for a whole genus that includes other species or vaccine work, so the gap is not interpretable.</li>
         </ul>
       </article>
       <article class="panel">
-        <h3>Vivli 2026 study data</h3>
-        <p>Funding and pipeline: Global AMR R&amp;D Hub (18,853 projects, USD 18.9B; USD 4.17B names one of the six). Burden: GRAM 2019, The Lancet 2022. 2030: Bayesian projection of extensively drug-resistant prevalence from 17.5 million Vivli AMR Register lab results.</p>
+        <h3>6 leading pathogens dataset</h3>
+        <p>Funding and pipeline: Global AMR R&amp;D Hub (18,853 projects, USD 18.9B; USD 4.17B names one of the six). Burden: GRAM 2019, The Lancet 2022. Resistance and 2030: 17.5 million Vivli AMR Register lab results (ATLAS, KEYSTONE, SIDERO-WT); Bayesian projection to 2030. Funding is tagged by genus. Index range across 6 funding/burden versions: 15.7–25.3%; 2030 80% range: 23.0–32.0%.</p>
       </article>
       <article class="panel">
         <h3>Limits</h3>
-        <p>Hub funding is tagged by genus, not species, and has no drug-class field. Burden is a 2019 global snapshot. <i>Streptococcus</i> funding includes vaccine and non-pneumoniae work.</p>
+        <p>The index compares shares, so it is only as good as the funding attribution and burden estimates you enter. It measures alignment with burden, not scientific opportunity; treat it as an audit, not an allocation formula.</p>
       </article>
     </div>
   </section>
@@ -374,38 +425,67 @@ footer a{color:var(--fund)}
 
 <script>
 (function(){
+  // ---------- reference data ----------
   var STUDY = [
-    {name:'K. pneumoniae', fund:{base:349.1, prop:744.1, equal:938.9},  deaths:193000, dalys:8200000, d2030:25.64, pipe:9,  recv:true},
-    {name:'A. baumannii',  fund:{base:338.7, prop:734.6, equal:933.8},  deaths:132000, dalys:3670000, d2030:12.58, pipe:4,  recv:true},
-    {name:'E. coli',       fund:{base:700.9, prop:1441.2, equal:1300.9}, deaths:219000, dalys:7520000, d2030:22.42, pipe:19},
-    {name:'S. pneumoniae*',fund:{base:794.6, prop:1064.6, equal:1215.9}, deaths:122000, dalys:6110000, d2030:12.49, pipe:2},
-    {name:'S. aureus',     fund:{base:1117.3, prop:1691.7, equal:1540.4}, deaths:178000, dalys:5870000, d2030:18.22, pipe:23},
-    {name:'P. aeruginosa', fund:{base:869.9, prop:1721.6, equal:1467.8},  deaths:84600,  dalys:3050000, d2030:8.66,  pipe:19}
+    {name:'K. pneumoniae', g:'Klebsiella spp. funding', res:18.6, tr:'up', fund:{base:349.1, prop:744.1, equal:938.9},  deaths:193000, dalys:8200000, d2030:25.64, pipe:9},
+    {name:'A. baumannii', g:'Acinetobacter spp. funding', res:63.0, tr:'flat', fund:{base:338.7, prop:734.6, equal:933.8},  deaths:132000, dalys:3670000, d2030:12.58, pipe:4},
+    {name:'E. coli', g:'Escherichia spp. funding', fund:{base:700.9, prop:1441.2, equal:1300.9}, deaths:219000, dalys:7520000, d2030:22.42, pipe:19},
+    {name:'S. pneumoniae*', g:'Streptococcus spp. funding', lab:'Genus artefact', fund:{base:794.6, prop:1064.6, equal:1215.9}, deaths:122000, dalys:6110000, d2030:12.49, pipe:2},
+    {name:'S. aureus', g:'Staphylococcus spp. funding', fund:{base:1117.3, prop:1691.7, equal:1540.4}, deaths:178000, dalys:5870000, d2030:18.22, pipe:23},
+    {name:'P. aeruginosa', g:'Pseudomonas spp. funding', fund:{base:869.9, prop:1721.6, equal:1467.8},  deaths:84600,  dalys:3050000, d2030:8.66,  pipe:19}
   ];
-  var TH = {deaths:'Burden (deaths)', dalys:'Burden (DALYs)', d2030:'Burden (% of 2030 deaths)', custom:'Burden'};
-  var LEG = {deaths:'Deaths', dalys:'DALYs', d2030:'Deaths, 2030', custom:'Burden'};
-  var SUB = {deaths:'Global AMR R&D Hub funding against GRAM 2019 attributable deaths', dalys:'Global AMR R&D Hub funding against GRAM 2019 DALYs', d2030:'Global AMR R&D Hub funding against projected 2030 deaths (Bayesian projection)', custom:'Your portfolio'};
-  var nextId = 1, state = {rows:[], x:0, burden:'deaths', fund:'base', study:true};
+  // WHO Bacterial Priority Pathogens List 2024 (tier by organism; tiers refer to specific resistance types)
+  var WHO = [
+    ['Acinetobacter baumannii','Critical','carbapenem-R',/acineto|a\. ?baumannii/i],
+    ['Klebsiella pneumoniae','Critical','carbapenem- / 3GC-R',/klebsiella|k\. ?pneumoniae/i],
+    ['Escherichia coli','Critical','carbapenem- / 3GC-R',/escherichia|e\. ?coli/i],
+    ['Enterobacter spp.','Critical','carbapenem- / 3GC-R',/enterobacter\b/i],
+    ['Enterobacterales','Critical','carbapenem- / 3GC-R',/enterobacterales/i],
+    ['Mycobacterium tuberculosis','Critical','rifampicin-R',/tubercul/i],
+    ['Salmonella Typhi','High','fluoroquinolone-R',/typhi\b/i],
+    ['Shigella spp.','High','fluoroquinolone-R',/shigella/i],
+    ['Enterococcus faecium','High','vancomycin-R',/enterococc/i],
+    ['Pseudomonas aeruginosa','High','carbapenem-R',/pseudomonas|p\. ?aeruginosa/i],
+    ['Non-typhoidal Salmonella','High','fluoroquinolone-R',/non-?typhoidal|salmonella(?! typhi)/i],
+    ['Neisseria gonorrhoeae','High','3GC- / FQ-R',/gonorr/i],
+    ['Staphylococcus aureus','High','methicillin-R',/staphylo|s\. ?aureus/i],
+    ['Streptococcus pyogenes (group A)','Medium','macrolide-R',/pyogenes|group a strep/i],
+    ['Streptococcus pneumoniae','Medium','macrolide-R',/streptococcus pneumoniae|s\. ?pneumoniae/i],
+    ['Haemophilus influenzae','Medium','ampicillin-R',/haemophilus|h\. ?influenzae/i],
+    ['Streptococcus agalactiae (group B)','Medium','penicillin-R',/agalactiae|group b strep/i]
+  ];
+  function whoOf(name){ for (var i=0;i<WHO.length;i++) if (WHO[i][3].test(name||'')) return {t:WHO[i][1], r:WHO[i][2]}; return null; }
+  function tierOf(name){ var w = whoOf(name); return w ? w.t : ''; }
+  function whoText(name){ var w = whoOf(name); return w ? w.t + ' · ' + w.r : ''; }
+  var SHORT = {'carbapenem-R':'CR','carbapenem- / 3GC-R':'CR / 3GC-R','rifampicin-R':'RR','fluoroquinolone-R':'FQ-R','vancomycin-R':'VRE','3GC- / FQ-R':'3GC / FQ-R','methicillin-R':'MRSA','macrolide-R':'macrolide-R','ampicillin-R':'ampicillin-R','penicillin-R':'penicillin-R'};
+  function whoShort(name){ var w = whoOf(name); return w ? 'WHO ' + w.t + ' · ' + (SHORT[w.r] || w.r) : ''; }
+
+  var LEG = {deaths:'Deaths', dalys:'DALYs', d2030:'Deaths, 2030'};
+  var nextId = 1;
+  var st = {rows:[], x:0, burden:'deaths', fund:'base', ds:'vivli', name:'6 leading pathogens', blabel:'Deaths', cur:'$', mode:'auto', sort:'gap'};
+
   function $(id){ return document.getElementById(id); }
   function f1(v){ return (Math.round(v*10)/10).toFixed(1); }
-  function money(m){ m = Math.max(0, m); return m >= 1000 ? '$' + (m/1000).toFixed(2).replace(/\.?0+$/,'') + 'B' : '$' + Math.round(m) + 'M'; }
+  function money(m){ m = Math.max(0, m); var c = st.cur || ''; return m >= 1000 ? c + (m/1000).toFixed(2).replace(/\.?0+$/,'') + 'B' : c + Math.round(m) + 'M'; }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-  function nice(v){ var steps=[100,200,400,600,800,1000,1200,1600,2000,3000,4000,6000,8000,10000]; for (var i=0;i<steps.length;i++) if (steps[i] >= v) return steps[i]; return Math.ceil(v/5000)*5000; }
+  function nice(v){ var s=[100,200,400,600,800,1000,1200,1600,2000,3000,4000,6000,8000,10000,20000,40000]; for (var i=0;i<s.length;i++) if (s[i] >= v) return s[i]; return Math.ceil(v/50000)*50000; }
+  function study(){ return st.ds === 'vivli'; }
 
   function loadStudy(){
-    var keep = {}; state.rows.forEach(function(r){ keep[r.name] = r.recv; });
-    var had = state.rows.length > 0;
-    state.rows = STUDY.map(function(s){ return {id:nextId++, name:s.name, fund:s.fund[state.fund], burden: state.burden === 'd2030' ? s.d2030 : s[state.burden], pipe:s.pipe, recv: had && (s.name in keep) ? keep[s.name] : !!s.recv}; });
-    state.study = true;
+    var keep = {}; st.rows.forEach(function(r){ keep[r.name] = r.recv; });
+    st.rows = STUDY.map(function(s){ return {id:nextId++, name:s.name, g:s.g, res:s.res==null?null:s.res, tr:s.tr, lab:s.lab, fund:s.fund[st.fund], burden: st.burden === 'd2030' ? s.d2030 : s[st.burden], pipe:s.pipe, recv:!!keep[s.name]}; });
+    st.ds = 'vivli'; st.name = '6 leading pathogens'; st.blabel = LEG[st.burden]; st.cur = '$';
   }
+  function toCustom(){ if (st.ds !== 'custom'){ st.ds = 'custom'; if (st.name === '6 leading pathogens') st.name = '6 leading pathogens (edited)'; } }
 
+  // ---------- core computation ----------
   function compute(x){
-    var R = state.rows.filter(function(r){ return isFinite(r.fund) && isFinite(r.burden) && r.fund >= 0 && r.burden >= 0; });
+    var R = st.rows.filter(function(r){ return r.fund != null && r.burden != null && isFinite(r.fund) && isFinite(r.burden) && r.fund >= 0 && r.burden >= 0; });
     var T = R.reduce(function(a,r){ return a + r.fund; }, 0), B = R.reduce(function(a,r){ return a + r.burden; }, 0);
-    if (!(T > 0) || !(B > 0)) return null;
+    if (R.length < 2 || !(T > 0) || !(B > 0)) return null;
     var f = R.map(function(r){ return r.fund / T; }), b = R.map(function(r){ return r.burden / B; });
-    var anyRecv = R.some(function(r){ return r.recv; });
-    var isRecv = R.map(function(r,i){ return anyRecv ? !!r.recv : b[i] > f[i]; });
+    var pick = st.mode === 'pick' && R.some(function(r){ return r.recv; });
+    var isRecv = R.map(function(r,i){ return pick ? !!r.recv : b[i] > f[i]; });
     var def = R.map(function(r,i){ return isRecv[i] ? Math.max(0,(b[i]-f[i])*T) : 0; });
     var sur = R.map(function(r,i){ return !isRecv[i] ? Math.max(0,(f[i]-b[i])*T) : 0; });
     var D = def.reduce(function(a,c){return a+c;},0), S = sur.reduce(function(a,c){return a+c;},0);
@@ -417,52 +497,73 @@ footer a{color:var(--fund)}
     var pTot = R.reduce(function(a,r){ return a + (r.pipe || 0); }, 0);
     var sh = R.map(function(r){ return pTot ? (r.pipe||0)/pTot : 0; }).sort(function(a,c){return a-c;});
     var med = sh.length % 2 ? sh[(sh.length-1)/2] : (sh[sh.length/2-1] + sh[sh.length/2]) / 2;
-    return {R:R, T:T, f:f, b:b, F2:F2, f2:f2, delta:delta, D:D, S:S, xe:xe, gmi:gmi, gmi0:gmi0, full:gmi0/100*T, pTot:pTot, med:med, anyRecv:anyRecv};
+    return {R:R, T:T, f:f, b:b, F2:F2, f2:f2, delta:delta, D:D, S:S, xe:xe, gmi:gmi, gmi0:gmi0, full:gmi0/100*T, pTot:pTot, med:med, isRecv:isRecv, pick:pick};
   }
   function label(c, i){
+    if (c.R[i].lab) return {t:c.R[i].lab, cls:''};
     var under = c.b[i] > c.f[i] + 0.005, over = c.f[i] > c.b[i] + 0.005;
-    if (!c.pTot) return under ? {t:'Under-funded', cls:'warn'} : over ? {t:'Over-funded', cls:''} : {t:'Aligned', cls:''};
+    var hasPipe = c.R.some(function(r){ return r.pipe != null && r.pipe !== ''; });
+    if (!hasPipe || !c.pTot) return under ? {t:'Under-funded', cls:'warn'} : over ? {t:'Over-funded', cls:''} : {t:'Aligned', cls:''};
     var rich = (c.R[i].pipe || 0) / c.pTot > c.med;
     if (under) return rich ? {t:'Pipeline OK', cls:'warn'} : {t:'Neglected', cls:'neg'};
     if (over) return rich ? {t:'Well-resourced', cls:''} : {t:'Low translation', cls:''};
     return {t:'Aligned', cls:''};
   }
 
+  // ---------- rendering ----------
   var tbody = $('tbody'), rowsEl = $('rows'), recvEl = $('recv'), presetsEl = $('presets'), amt = $('amt'), last = null;
+  $('pathogens').innerHTML = WHO.map(function(w){ return '<option value="'+esc(w[0])+'">'+w[1]+' priority</option>'; }).join('');
 
   function renderTable(){
-    $('th-burden').textContent = TH[state.study ? state.burden : 'custom'];
-    tbody.innerHTML = state.rows.map(function(r){
-      return '<tr data-id="'+r.id+'"><td><input id="r'+r.id+'-name" data-f="name" value="'+esc(r.name)+'" aria-label="Pathogen name"></td>'+
-        '<td><input id="r'+r.id+'-fund" class="n" data-f="fund" inputmode="decimal" value="'+r.fund+'" aria-label="Funding, '+esc(r.name)+'"></td>'+
-        '<td><input id="r'+r.id+'-burden" class="n" data-f="burden" inputmode="decimal" value="'+r.burden+'" aria-label="Burden, '+esc(r.name)+'"></td>'+
+    $('th-burden').textContent = 'Burden (' + (st.blabel || 'any unit') + ')';
+    $('th-fund').textContent = 'Funding (' + (st.cur || '') + 'M)';
+    tbody.innerHTML = st.rows.length ? st.rows.map(function(r){
+      var t = tierOf(r.name);
+      return '<tr data-id="'+r.id+'"><td><input id="r'+r.id+'-name" data-f="name" list="pathogens" value="'+esc(r.name)+'" aria-label="Pathogen name"></td>'+
+        '<td><span class="tier" id="r'+r.id+'-tier">'+(whoText(r.name)||'–')+'</span></td>'+
+        '<td><input id="r'+r.id+'-fund" class="n" data-f="fund" inputmode="decimal" value="'+(r.fund==null?'':r.fund)+'" aria-label="Funding, '+esc(r.name)+'"></td>'+
+        '<td><input id="r'+r.id+'-burden" class="n" data-f="burden" inputmode="decimal" value="'+(r.burden==null?'':r.burden)+'" aria-label="Burden, '+esc(r.name)+'"></td>'+
+        '<td><input id="r'+r.id+'-res" class="n" data-f="res" inputmode="decimal" value="'+(r.res==null?'':r.res)+'" aria-label="Resistant percent, '+esc(r.name)+'"></td>'+
         '<td><input id="r'+r.id+'-pipe" class="n" data-f="pipe" inputmode="numeric" value="'+(r.pipe==null?'':r.pipe)+'" aria-label="Late-stage projects, '+esc(r.name)+'"></td>'+
         '<td style="text-align:center"><button class="x" data-del="'+r.id+'" aria-label="Remove '+esc(r.name)+'">×</button></td></tr>';
-    }).join('');
+    }).join('') : '<tr><td colspan="7" class="empty-state">No pathogens yet. Add one, or import a portfolio below.</td></tr>';
+    $('f-name').value = st.name; $('f-burden').value = st.blabel; $('f-cur').value = st.cur;
   }
   function renderRecv(){
-    recvEl.innerHTML = state.rows.map(function(r){ return '<button class="chip recv" data-id="'+r.id+'" aria-pressed="'+(!!r.recv)+'"><i>'+esc(r.name)+'</i></button>'; }).join('');
+    recvEl.hidden = st.mode !== 'pick';
+    recvEl.innerHTML = st.rows.map(function(r){ return '<button class="chip recv" data-id="'+r.id+'" aria-pressed="'+(!!r.recv)+'"><i>'+esc(r.name)+'</i></button>'; }).join('');
+    document.querySelectorAll('#seg-mode button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.k === st.mode)); });
   }
   function renderMeta(){
-    var key = state.study ? state.burden : 'custom';
-    $('leg-b').textContent = LEG[key]; $('sub').textContent = SUB[key];
-    $('filters').classList.toggle('off', !state.study);
-    $('dataset').classList.toggle('custom', !state.study);
-    $('dataset-t').textContent = state.study ? 'Vivli 2026 study · 6 pathogens' : 'Custom portfolio · ' + state.rows.length + ' pathogens';
-    $('data-msg').textContent = state.study ? 'Source: Global AMR R&D Hub; GRAM 2019, The Lancet 2022.' : 'Custom data. Reset to return to the study figures.';
+    $('ds-select').value = st.ds;
+        $('filters').hidden = !study();
+    $('ds-name').textContent = st.name || 'Untitled portfolio';
+    $('leg-b').textContent = st.blabel || 'Burden';
+    $('sub').textContent = study() ? 'Global AMR R&D Hub funding vs ' + ({deaths:'GRAM 2019 attributable deaths', dalys:'GRAM 2019 DALYs', d2030:'projected 2030 deaths'})[st.burden]
+      : st.rows.length + ' pathogen' + (st.rows.length===1?'':'s') + ' · funding vs ' + (st.blabel || 'burden').toLowerCase();
+    $('data-msg').textContent = study() ? 'Source: Global AMR R&D Hub; GRAM 2019, The Lancet 2022.' : '';
+  }
+  function sortIdx(c){
+    var idx = c.R.map(function(_,i){ return i; });
+    if (st.sort === 'gap') idx.sort(function(a,b){ return (c.f[a]-c.b[a]) - (c.f[b]-c.b[b]); });
+    else if (st.sort === 'burden') idx.sort(function(a,b){ return c.b[b] - c.b[a]; });
+    else idx.sort(function(a,b){ return String(c.R[a].name).localeCompare(String(c.R[b].name)); });
+    return idx;
   }
 
   function render(){
     renderMeta();
-    var c = compute(state.x); last = c;
-    if (!c){ rowsEl.innerHTML = '<p class="msg err" style="padding:16px 0">Add at least one pathogen with funding and burden above zero.</p>'; return; }
-
-    var maxV = nice(Math.max(c.S, c.D, 100));
-    if (+amt.max !== maxV){ amt.max = maxV; if (state.x > maxV){ state.x = maxV; amt.value = maxV; } }
+    var c = compute(st.x); last = c;
+    if (!c){
+      rowsEl.innerHTML = '<p class="empty-state">Add at least two pathogens with funding and burden above zero to see the index. <button class="btn ghost" data-go="data">Go to Data</button></p>';
+      ['k-gmi','k-total','k-worst','k-full','r-gmi'].forEach(function(id){ $(id).textContent = '–'; });
+      $('over-track').innerHTML = $('under-track').innerHTML = $('keylist').innerHTML = ''; $('over-tot').textContent = $('under-tot').textContent = '';
+      presetsEl.innerHTML = ''; return;
+    }
+    var maxV = nice(Math.max(c.S, c.D, 1) * 1.05);
+    var step = maxV / 120; step = step < 1 ? 1 : Math.pow(10, Math.floor(Math.log10(step)));
+    if (+amt.max !== maxV){ amt.max = maxV; amt.step = step; if (st.x > maxV){ st.x = maxV; amt.value = maxV; } }
     $('scale').innerHTML = [0,.25,.5,.75,1].map(function(t){ return '<span>' + money(maxV*t) + '</span>'; }).join('');
-    var showAsk = state.study && state.fund === 'base';
-    $('ask-band').hidden = !showAsk; $('ask-label').hidden = !showAsk;
-    if (showAsk){ $('ask-band').style.left = (400/maxV*100)+'%'; $('ask-band').style.width = (200/maxV*100)+'%'; $('ask-label').style.left = (500/maxV*100)+'%'; }
 
     var mx = Math.max.apply(null, c.f2.concat(c.b, c.f)) * 100;
     var AX = Math.max(10, Math.ceil((mx + 4) / 10) * 10), ticks = [];
@@ -470,80 +571,77 @@ footer a{color:var(--fund)}
     $('axis').innerHTML = ticks.map(function(t){ return '<span style="left:'+(t/AX*100)+'%">'+t+'%</span>'; }).join('');
     var gl = ticks.slice(1).map(function(t){ return '<span class="gl" style="left:'+(t/AX*100)+'%"></span>'; }).join('');
 
-    rowsEl.innerHTML = c.R.map(function(r,i){
-      var f = c.f2[i]*100, b = c.b[i]*100, g = f - b, dm = c.delta[i], lab = label(c,i);
+    rowsEl.innerHTML = sortIdx(c).map(function(i){
+      var r = c.R[i], f = c.f2[i]*100, b = c.b[i]*100, g = f - b, dm = c.delta[i], lab = label(c,i), tier = tierOf(r.name);
       var cls = Math.abs(g) < 0.5 ? 'ok' : g < 0 ? 'neg' : 'pos', word = Math.abs(g) < 0.5 ? 'aligned' : g < 0 ? 'under' : 'over';
+      var tp = tier ? '<span class="pill who-'+tier.charAt(0).toLowerCase()+'" title="'+esc(whoText(r.name))+'">'+esc(whoShort(r.name))+'</span>' : '';
+      var rs = r.res==null ? '<div class="res">–<small>no data</small></div>' : '<div class="res"><span>'+f1(r.res)+'%'+(r.tr==='up'?' <span class="up">↑</span>':r.tr==='flat'?' <span class="flat">→</span>':'')+'</span><small>'+(r.tr==='up'?'rising':r.tr==='flat'?'flat':'resistant')+'</small></div>';
       return '<div class="grid row" tabindex="0" data-i="'+i+'" aria-label="'+esc(r.name)+': '+f1(f)+'% of funding, '+f1(b)+'% of burden">'+
-        '<div class="who"><em>'+esc(r.name)+'</em><span class="pill '+lab.cls+'">'+lab.t+'</span></div>'+
+        '<div class="who"><em>'+esc(r.name)+'</em>'+(r.g?'<span class="gnote">'+esc(r.g)+'</span>':'')+'<div class="tags"><span class="pill '+lab.cls+'">'+lab.t+'</span>'+tp+'</div></div>'+
         '<div class="bars">'+gl+
-          '<div class="b f"><div class="m" style="width:'+Math.min(100,f/AX*100)+'%"></div><span class="v">'+f1(f)+'%</span>'+(Math.abs(dm)>=1?'<span class="dv '+(dm>0?'plus':'minus')+'">'+(dm>0?'+':'−')+money(Math.abs(dm))+'</span>':'')+'</div>'+
+          '<div class="b f"><div class="m" style="width:'+Math.min(100,f/AX*100)+'%"></div><span class="v">'+f1(f)+'%</span>'+(Math.abs(dm)>=0.5?'<span class="dv '+(dm>0?'plus':'minus')+'">'+(dm>0?'+':'−')+money(Math.abs(dm))+'</span>':'')+'</div>'+
           '<div class="b d"><div class="m" style="width:'+Math.min(100,b/AX*100)+'%"></div><span class="v">'+f1(b)+'%</span></div></div>'+
-        '<div class="gap '+cls+'">'+(g>0.05?'+':g<-0.05?'−':'')+f1(Math.abs(g))+'<small>pp '+word+'</small></div>'+
+        '<div class="gap '+cls+'">'+(g>0.05?'+':g<-0.05?'−':'')+f1(Math.abs(g))+'<small>pp '+word+'</small></div>'+rs+
         '<div class="pipe">'+(r.pipe==null||r.pipe===''?'–':r.pipe)+'<small>projects</small></div></div>';
     }).join('');
 
-    // KPIs
     $('k-gmi').innerHTML = f1(c.gmi) + '<small>%</small>';
     var d = c.gmi - c.gmi0, kd = $('k-delta');
-    if (state.x === 0){ kd.textContent = state.study && state.burden === 'd2030' ? '2030, no change' : 'current'; kd.className = 'delta'; }
+    if (st.x === 0){ kd.textContent = study() && st.burden === 'd2030' ? '2030, no change' : 'current'; kd.className = 'delta'; }
     else { kd.textContent = (d<0?'−':'+') + f1(Math.abs(d)) + ' pts'; kd.className = 'delta' + (d<0?' down':''); }
     var GM = Math.max(40, Math.ceil((c.gmi0 + 5)/10)*10);
     $('k-meter').style.width = Math.min(100, c.gmi/GM*100) + '%'; $('k-mark').style.left = (c.gmi0/GM*100) + '%';
-    $('k-cap').textContent = state.x === 0 ? 'of funding would have to move to match burden' : 'after moving ' + money(c.xe) + ' (was ' + f1(c.gmi0) + '%)';
-    $('k-total').textContent = money(c.T); $('k-total-s').textContent = 'across ' + c.R.length + ' pathogen' + (c.R.length === 1 ? '' : 's');
+    $('k-rng').textContent = (study() && st.x === 0) ? (st.burden === 'd2030' ? '80% range 23.0–32.0%' : 'range across 6 versions 15.7–25.3%') : '';
+    $('k-cap').textContent = st.x === 0 ? 'of funding would have to move to match burden' : 'after moving ' + money(c.xe) + ' (was ' + f1(c.gmi0) + '%)';
+    $('k-total').textContent = money(c.T); $('k-total-s').textContent = 'across ' + c.R.length + ' pathogens';
     var wi = 0; c.f.forEach(function(v,i){ if (v - c.b[i] < c.f[wi] - c.b[wi]) wi = i; });
     $('k-worst').textContent = '−' + f1(Math.abs((c.f[wi]-c.b[wi])*100)) + ' pp'; $('k-worst-s').innerHTML = '<i>' + esc(c.R[wi].name) + '</i>, before rebalancing';
     $('k-full').textContent = money(c.full);
 
-    // side panel
-    $('amt-out').textContent = money(state.x);
-    $('amt-of').textContent = f1(state.x / c.T * 100) + '% of ' + money(c.T);
+    $('amt-out').textContent = money(st.x);
+    $('amt-of').textContent = f1(st.x / c.T * 100) + '% of ' + money(c.T);
     $('r-gmi').textContent = f1(c.gmi) + '%';
     $('r-closed').textContent = (c.D > 0 ? Math.round(Math.min(100, c.xe/c.D*100)) : 100) + '%';
-    $('r-closed-l').textContent = state.x > c.D + 5 && c.D > 0 ? 'closed; past ' + money(c.D) + ' it over-shoots' : (c.anyRecv ? 'of the chosen gaps closed' : 'of all gaps closed');
-    renderPresets(c);
-    renderWhy(c);
+    $('r-closed-l').textContent = st.x > c.D * 1.02 && c.D > 0 ? 'closed; past ' + money(c.D) + ' it over-shoots' : (c.pick ? 'of the chosen gaps closed' : 'of all gaps closed');
+    renderPresets(c); renderWhy(c);
   }
-
   function renderPresets(c){
-    var P = [{t:'Current', v:0}];
-    if (state.study && state.fund === 'base'){ P.push({t:'$400M', v:400}); P.push({t:'$600M', v:600}); }
-    P.push({t:'Close chosen gaps', v:Math.round(c.D/10)*10});
-    presetsEl.innerHTML = P.map(function(p){ return '<button class="chip" data-v="'+p.v+'" aria-pressed="'+(p.v===state.x)+'">'+esc(p.t)+'</button>'; }).join('') + '<button class="chip" data-full="1" aria-pressed="false">Align all</button>';
+    var snap = function(v){ var s = +amt.step || 1; return Math.round(v / s) * s; };
+    var P = [{t:'None', v:0}, {t:'Close 25%', v:snap(c.D*.25)}, {t:'50%', v:snap(c.D*.5)}, {t:'100%', v:snap(c.D)}];
+    presetsEl.innerHTML = P.map(function(p){ return '<button class="chip" data-v="'+p.v+'" aria-pressed="'+(p.v===st.x)+'">'+esc(p.t)+'</button>'; }).join('');
   }
-
   function renderWhy(c){
     var items = c.R.map(function(r,i){ return {n:r.name, g:(c.f2[i]-c.b[i])*100}; });
     var over = items.filter(function(x){ return x.g > 0.05; }).sort(function(a,b){ return b.g-a.g; });
     var under = items.filter(function(x){ return x.g < -0.05; }).sort(function(a,b){ return a.g-b.g; });
     var so = over.reduce(function(a,x){ return a+x.g; },0), su = -under.reduce(function(a,x){ return a+x.g; },0);
-    var scale = Math.max(c.gmi0, so, su, 0.1); // fixed to the starting gap, so the bars visibly shrink as money moves
+    var scale = Math.max(c.gmi0, so, su, 0.1);
     function seg(list, cls){ return list.map(function(x){ var w = Math.abs(x.g)/scale*100; return '<div class="seg-b '+cls+'" style="flex:0 0 calc('+w+'% - 2px)" title="'+esc(x.n)+' '+(x.g>0?'+':'−')+f1(Math.abs(x.g))+' pts">'+(w > 14 ? '<i>'+esc(x.n)+'</i>&nbsp;'+(x.g>0?'+':'−')+f1(Math.abs(x.g)) : '')+'</div>'; }).join(''); }
     $('over-track').innerHTML = seg(over,'o'); $('under-track').innerHTML = seg(under,'u');
     $('over-tot').textContent = '+' + f1(so); $('under-tot').textContent = '−' + f1(su);
     $('why-title').textContent = 'Why ' + f1(c.gmi) + '%?';
-    $('keylist').innerHTML = over.concat(under).map(function(x){ return '<em><i>'+esc(x.n)+'</i></em> <span>'+(x.g>0?'+':'−')+f1(Math.abs(x.g))+'</span>'; }).map(function(h){ return '<div>'+h+'</div>'; }).join('');
+    $('keylist').innerHTML = over.concat(under).map(function(x){ return '<div><em><i>'+esc(x.n)+'</i></em> <span>'+(x.g>0?'+':'−')+f1(Math.abs(x.g))+'</span></div>'; }).join('');
   }
 
-  // tooltip
+  // ---------- tooltip ----------
   var tip = $('tip');
   function showTip(i, x, y){
-    if (!last || !last.R[i]) return; var r = last.R[i];
-    tip.innerHTML = '<b>'+esc(r.name)+'</b><br><span class="k">Funding</span> ' + money(last.F2[i]) + ' · ' + f1(last.f2[i]*100) + '%' +
-      (Math.abs(last.delta[i])>=1 ? '<br><span class="k">Change</span> ' + (last.delta[i]>0?'+':'−') + money(Math.abs(last.delta[i])) : '') +
-      '<br><span class="k">Burden share</span> ' + f1(last.b[i]*100) + '%<br><span class="k">Late-stage projects</span> ' + (r.pipe==null||r.pipe===''?'not given':r.pipe) +
+    if (!last || !last.R[i]) return; var r = last.R[i], t = tierOf(r.name);
+    tip.innerHTML = '<b>'+esc(r.name)+'</b>'+(t?'<br><span class="k">WHO</span> '+esc(whoText(r.name)):'')+(r.g?'<br><span class="k">'+esc(r.g)+'</span>':'')+(r.res!=null?'<br><span class="k">Resistant</span> '+f1(r.res)+'%'+(r.tr==='up'?', rising':r.tr==='flat'?', flat':''):'')+'<br><span class="k">Funding</span> ' + money(last.F2[i]) + ' · ' + f1(last.f2[i]*100) + '%' +
+      (Math.abs(last.delta[i])>=0.5 ? '<br><span class="k">Change</span> ' + (last.delta[i]>0?'+':'−') + money(Math.abs(last.delta[i])) : '') +
+      '<br><span class="k">'+esc(st.blabel||'Burden')+' share</span> ' + f1(last.b[i]*100) + '%<br><span class="k">Late-stage projects</span> ' + (r.pipe==null||r.pipe===''?'not given':r.pipe) +
       (/\*$/.test(r.name) ? '<br><span class="k">* Genus-level funding includes vaccine and non-pneumoniae work.</span>' : '');
     tip.style.opacity = '1';
-    var w = tip.offsetWidth, h = tip.offsetHeight, l = x + 16, t = y + 16;
-    if (l + w > innerWidth - 8) l = x - w - 16; if (t + h > innerHeight - 8) t = y - h - 16;
-    tip.style.left = Math.max(8,l) + 'px'; tip.style.top = Math.max(8,t) + 'px';
+    var w = tip.offsetWidth, h = tip.offsetHeight, l = x + 16, tt = y + 16;
+    if (l + w > innerWidth - 8) l = x - w - 16; if (tt + h > innerHeight - 8) tt = y - h - 16;
+    tip.style.left = Math.max(8,l) + 'px'; tip.style.top = Math.max(8,tt) + 'px';
   }
   rowsEl.addEventListener('mousemove', function(e){ var r = e.target.closest('.row'); if (r) showTip(+r.dataset.i, e.clientX, e.clientY); });
   rowsEl.addEventListener('mouseleave', function(){ tip.style.opacity = '0'; });
   rowsEl.addEventListener('focusin', function(e){ var r = e.target.closest('.row'); if (r){ var bb = r.getBoundingClientRect(); showTip(+r.dataset.i, bb.left + 180, bb.top); } });
   rowsEl.addEventListener('focusout', function(){ tip.style.opacity = '0'; });
 
-  // tabs
+  // ---------- navigation ----------
   var tabs = document.querySelectorAll('.tabs button');
   function show(v){
     tabs.forEach(function(t){ t.setAttribute('aria-selected', String(t.dataset.view === v)); });
@@ -552,73 +650,82 @@ footer a{color:var(--fund)}
     window.scrollTo(0,0);
   }
   tabs.forEach(function(t){ t.addEventListener('click', function(){ show(t.dataset.view); }); });
+  document.addEventListener('click', function(e){ var g = e.target.closest('[data-go]'); if (g) show(g.dataset.go); });
   if (location.hash === '#data' || location.hash === '#method') show(location.hash.slice(1));
 
-  // controls
-  amt.addEventListener('input', function(){ state.x = +amt.value; render(); });
-  presetsEl.addEventListener('click', function(e){
-    var b = e.target.closest('button'); if (!b) return;
-    if (b.dataset.full){ var c0 = compute(0); state.rows.forEach(function(r){ var i = c0.R.indexOf(r); r.recv = i >= 0 && c0.b[i] > c0.f[i]; }); renderRecv(); state.x = Math.round(compute(0).D/10)*10; }
-    else state.x = +b.dataset.v;
-    amt.value = state.x; render();
-  });
-  recvEl.addEventListener('click', function(e){
-    var b = e.target.closest('button'); if (!b) return;
-    var r = state.rows.find(function(r){ return r.id === +b.dataset.id; }); r.recv = !r.recv;
-    b.setAttribute('aria-pressed', String(r.recv)); render();
-  });
-  function custom(){ state.study = false; }
-  tbody.addEventListener('input', function(e){
-    var inp = e.target, tr = inp.closest('tr'); if (!tr) return;
-    var r = state.rows.find(function(r){ return r.id === +tr.dataset.id; }), k = inp.dataset.f;
-    if (k === 'name') r.name = inp.value; else { var v = parseFloat(inp.value.replace(/,/g,'')); r[k] = k === 'pipe' && inp.value.trim() === '' ? null : (isFinite(v) ? v : 0); }
-    custom(); if (k === 'name') renderRecv(); $('th-burden').textContent = TH.custom; render();
-  });
-  tbody.addEventListener('click', function(e){
-    var b = e.target.closest('[data-del]'); if (!b) return;
-    state.rows = state.rows.filter(function(r){ return r.id !== +b.dataset.del; }); custom(); renderTable(); renderRecv(); render();
-  });
-  $('add-row').addEventListener('click', function(){
-    var r = {id:nextId++, name:'New pathogen', fund:100, burden: state.study && state.burden === 'd2030' ? 5 : 50000, pipe:null, recv:false};
-    state.rows.push(r); custom(); renderTable(); renderRecv(); render(); var i = $('r'+r.id+'-name'); if (i){ i.focus(); i.select(); }
-  });
-  $('reset').addEventListener('click', function(){ state.rows = []; loadStudy(); state.x = 0; amt.value = 0; renderTable(); renderRecv(); render(); toast('Reset to the Vivli study data'); });
-  $('load-csv').addEventListener('click', function(){
-    var lines = $('csv').value.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean), rows = [], bad = 0;
-    lines.forEach(function(l, n){
-      var p = l.split(/[,;\t]/).map(function(s){ return s.trim(); }), fu = parseFloat(p[1]), bu = parseFloat(p[2]), pi = p[3] ? parseFloat(p[3]) : NaN;
-      if (n === 0 && isNaN(fu)) return;
-      if (!p[0] || !isFinite(fu) || !isFinite(bu)) { bad++; return; }
-      rows.push({id:nextId++, name:p[0], fund:fu, burden:bu, pipe:isFinite(pi) ? pi : null, recv:false});
-    });
-    var m = $('csv-msg');
-    if (!rows.length){ m.textContent = 'Nothing could be read. Use: name, funding, burden, late-stage projects.'; m.className = 'msg err'; return; }
-    state.rows = rows; state.x = 0; amt.value = 0; custom(); renderTable(); renderRecv(); render();
-    m.textContent = 'Imported ' + rows.length + ' pathogens' + (bad ? '; skipped ' + bad + ' unreadable line' + (bad>1?'s':'') : '') + '.'; m.className = 'msg';
-    show('overview'); toast('Portfolio imported');
-  });
+  // ---------- dataset ----------
+  function reset(){ st.x = 0; amt.value = 0; }
+  function blank(){ st.rows = []; st.ds = 'custom'; st.name = 'Untitled portfolio'; st.blabel = 'Deaths'; st.cur = '$'; st.mode = 'auto'; reset(); addRow(); addRow(); renderAll(); show('data'); }
+  function renderAll(){ renderTable(); renderRecv(); render(); }
+  $('ds-select').addEventListener('change', function(e){ if (e.target.value === 'vivli'){ st.rows = []; loadStudy(); reset(); renderAll(); toast('Loaded 6 leading pathogens'); } else if (e.target.value === 'blank') blank(); });
+  function addRow(){ var r = {id:nextId++, name:'', fund:null, burden:null, pipe:null, recv:false}; st.rows.push(r); return r; }
+
+  // ---------- controls ----------
+  amt.addEventListener('input', function(){ st.x = +amt.value; render(); });
+  presetsEl.addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b) return; st.x = +b.dataset.v; amt.value = st.x; render(); });
+  document.querySelectorAll('#seg-mode button').forEach(function(b){ b.addEventListener('click', function(){ st.mode = b.dataset.k; renderRecv(); render(); }); });
+  recvEl.addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b) return; var r = st.rows.find(function(r){ return r.id === +b.dataset.id; }); r.recv = !r.recv; b.setAttribute('aria-pressed', String(r.recv)); render(); });
+  document.querySelectorAll('#seg-sort button').forEach(function(b){ b.addEventListener('click', function(){ st.sort = b.dataset.k; document.querySelectorAll('#seg-sort button').forEach(function(o){ o.setAttribute('aria-pressed', String(o===b)); }); render(); }); });
   function wireSeg(id, key){
     var bs = document.querySelectorAll('#'+id+' button');
-    bs.forEach(function(b){ b.addEventListener('click', function(){ state[key] = b.dataset.k; bs.forEach(function(o){ o.setAttribute('aria-pressed', String(o===b)); }); loadStudy(); renderTable(); renderRecv(); render(); }); });
+    bs.forEach(function(b){ b.addEventListener('click', function(){ st[key] = b.dataset.k; bs.forEach(function(o){ o.setAttribute('aria-pressed', String(o===b)); }); loadStudy(); renderAll(); }); });
   }
   wireSeg('seg-burden','burden'); wireSeg('seg-fund','fund');
 
-  // copy summary
+  // ---------- data editing ----------
+  tbody.addEventListener('input', function(e){
+    var inp = e.target, tr = inp.closest('tr'); if (!tr || !inp.dataset.f) return;
+    var r = st.rows.find(function(r){ return r.id === +tr.dataset.id; }), k = inp.dataset.f;
+    if (k === 'name'){ r.name = inp.value; var t = $('r'+r.id+'-tier'); if (t) t.textContent = whoText(r.name) || '–'; r.g = null; r.lab = null; }
+    else { var v = parseFloat(inp.value.replace(/,/g,'')); r[k] = inp.value.trim() === '' ? null : (isFinite(v) ? v : null); }
+    toCustom(); if (k === 'name') renderRecv(); render();
+  });
+  tbody.addEventListener('click', function(e){ var b = e.target.closest('[data-del]'); if (!b) return; st.rows = st.rows.filter(function(r){ return r.id !== +b.dataset.del; }); toCustom(); renderAll(); });
+  $('add-row').addEventListener('click', function(){ var r = addRow(); toCustom(); renderAll(); var i = $('r'+r.id+'-name'); if (i) i.focus(); });
+  $('clear').addEventListener('click', function(){ st.rows = []; toCustom(); st.name = 'Untitled portfolio'; reset(); renderAll(); });
+  $('f-name').addEventListener('input', function(e){ st.name = e.target.value; toCustom(); renderMeta(); });
+  $('f-burden').addEventListener('input', function(e){ st.blabel = e.target.value; toCustom(); $('th-burden').textContent = 'Burden (' + (st.blabel || 'any unit') + ')'; render(); });
+  $('f-cur').addEventListener('input', function(e){ st.cur = e.target.value; toCustom(); $('th-fund').textContent = 'Funding (' + (st.cur || '') + 'M)'; render(); });
+
+  function parseCSV(text){
+    var lines = text.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean), rows = [], bad = 0;
+    lines.forEach(function(l, n){
+      var p = l.split(/[,;\t]/).map(function(s){ return s.trim().replace(/^"|"$/g,''); }), fu = parseFloat(p[1]), bu = parseFloat(p[2]), pi = p[3] ? parseFloat(p[3]) : NaN, rz = p[4] ? parseFloat(p[4]) : NaN;
+      if (n === 0 && isNaN(fu)) return;
+      if (!p[0] || !isFinite(fu) || !isFinite(bu)) { bad++; return; }
+      rows.push({id:nextId++, name:p[0], fund:fu, burden:bu, pipe:isFinite(pi) ? pi : null, res:isFinite(rz) ? rz : null, recv:false});
+    });
+    return {rows:rows, bad:bad};
+  }
+  function importText(text, src){
+    var res = parseCSV(text), m = $('csv-msg');
+    if (!res.rows.length){ m.textContent = 'Nothing could be read. Use: name, funding, burden, late-stage projects.'; m.className = 'msg err'; return; }
+    st.rows = res.rows; st.ds = 'custom'; st.mode = 'auto'; if (!st.name || st.name.indexOf('6 leading') === 0) st.name = src || 'Imported portfolio'; reset(); renderAll();
+    m.textContent = 'Imported ' + res.rows.length + ' pathogens' + (res.bad ? '; skipped ' + res.bad + ' unreadable line' + (res.bad>1?'s':'') : '') + '.'; m.className = 'msg';
+    show('overview'); toast('Portfolio imported');
+  }
+  $('load-csv').addEventListener('click', function(){ importText($('csv').value); });
+  $('file').addEventListener('change', function(e){
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var rd = new FileReader(); rd.onload = function(){ importText(String(rd.result), f.name.replace(/\.[^.]+$/,'')); }; rd.readAsText(f); e.target.value = '';
+  });
+
+  // ---------- copy summary ----------
   var toastEl = $('toast'), tt;
   function toast(t){ toastEl.textContent = t; toastEl.style.opacity = '1'; clearTimeout(tt); tt = setTimeout(function(){ toastEl.style.opacity = '0'; }, 1800); }
   $('copy').addEventListener('click', function(){
     var c = last; if (!c) return;
-    var recv = c.R.filter(function(r){ return r.recv; }).map(function(r){ return r.name; });
-    var lines = ['Follow the Deaths: Global Misalignment Index', (state.study ? 'Data: Vivli 2026 study (' + LEG[state.burden] + ')' : 'Data: custom portfolio'),
-      'Index: ' + f1(c.gmi0) + '% of ' + money(c.T) + ' would have to move to match burden.'];
-    if (state.x > 0) lines.push('Moving ' + money(c.xe) + (recv.length ? ' to ' + recv.join(', ') : '') + ' brings it to ' + f1(c.gmi) + '%.');
+    var lines = ['Follow the Deaths: ' + (st.name || 'Untitled portfolio'), 'Misalignment index: ' + f1(c.gmi0) + '% of ' + money(c.T) + ' would have to move to match ' + (st.blabel || 'burden').toLowerCase() + '.'];
+    var order = sortIdx(c).slice(0,3).map(function(i){ return c.R[i].name + ' (' + f1((c.f[i]-c.b[i])*100) + ' pp)'; });
+    lines.push('Most under-funded: ' + order.join(', ') + '.');
+    if (st.x > 0) lines.push('Moving ' + money(c.xe) + ' brings it to ' + f1(c.gmi) + '%.');
     lines.push('Full alignment needs ' + money(c.full) + ' moved, no new money.');
-    var text = lines.join('\n');
-    try { navigator.clipboard.writeText(text).then(function(){ toast('Summary copied'); }, function(){ toast('Copy not available here'); }); } catch(e){ toast('Copy not available here'); }
+    try { navigator.clipboard.writeText(lines.join('\n')).then(function(){ toast('Summary copied'); }, function(){ toast('Copy not available here'); }); } catch(e){ toast('Copy not available here'); }
   });
 
-  loadStudy(); renderTable(); renderRecv(); render();
+  loadStudy(); renderAll();
 })();
 </script>
+
 </body>
 </html>
